@@ -1,18 +1,10 @@
 import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
 import BillsTable from "./app/BillsTable";
-import "./App.css";import { Button } from "./components/ui/button";
+import "./App.css";
 import { AddBillForm } from "./components/AddBillForm";
 ;
 
 function App() {
-  async function greet() {
-    setGreetMsg(await invoke("greet", { name }));
-  }
-
-  function handleClick() {
-    greet();
-  }
   
   const [bills, setBills] = useState([
     {
@@ -37,8 +29,9 @@ function App() {
     setBills(prev => [...prev, {
       ...newBill,
       squareFoot: Number(newBill.squareFoot),
-      ratePerSqft: Number(newBill.ratePerSqft)
+      ratePerSqft: Number(newBill.ratePerSqft),
     }])
+    
   }
 
   return (
@@ -49,7 +42,7 @@ function App() {
             <h1 className="text-[2rem] font-medium text-[#111827]">Chalaans</h1>
             <p className="text-[#6B7280]">Manage and track your chalaans</p>
           </div>
-          <AddBillForm onSubmit={handleAddBill} />
+          <AddBillForm onSubmit={handleAddBill} bills={bills}/>
         </div>
         <BillsTable bills={bills} />
       </div>

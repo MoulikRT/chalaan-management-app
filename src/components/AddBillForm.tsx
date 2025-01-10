@@ -18,9 +18,9 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
+import Bill from '@/app/bills.types'
 
-
-export function AddBillForm({ onSubmit }: any) {
+export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void, bills: Bill[] }) {
   const [open, setOpen] = useState(false)
   const [date, setDate] = useState<Date>()
   const [formData, setFormData] = useState({
@@ -35,12 +35,17 @@ export function AddBillForm({ onSubmit }: any) {
     const { name, value } = e.target
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: value.trim()
     }))
   }
 
   const handleSubmit = (e: any) => {
     e.preventDefault()
+    console.log(bills, formData)
+    if (bills.some(bill => bill.billNumber === formData.billNumber)) {
+        alert("Bill with the same number already exists")
+        return
+    }
     onSubmit({ ...formData, date })
     setFormData({
       customerName: '',

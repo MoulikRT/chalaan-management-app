@@ -6,4 +6,6 @@ interface Bill {
     squareFoot: number
     ratePerSqft: number
   }
+
+export default Bill
   
