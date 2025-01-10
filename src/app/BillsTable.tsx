@@ -6,6 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import Bill from "./bills.types";
 
 const BillsTable = ({ bills }: { bills: Bill[] }) => {
   return (

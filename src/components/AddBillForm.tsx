@@ -1,62 +1,68 @@
-import { useState } from 'react'
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { CalendarIcon, PlusIcon } from 'lucide-react'
-import { format } from "date-fns"
-import { Calendar } from "@/components/ui/calendar"
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon, PlusIcon } from "lucide-react";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
-import { cn } from "@/lib/utils"
-import Bill from '@/app/bills.types'
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import Bill from "@/app/bills.types";
 
-export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void, bills: Bill[] }) {
-  const [open, setOpen] = useState(false)
-  const [date, setDate] = useState<Date>()
+export function AddBillForm({
+  onSubmit,
+  bills,
+}: {
+  onSubmit: (bill: any) => void;
+  bills: Bill[];
+}) {
+  const [open, setOpen] = useState(false);
+  const [date, setDate] = useState<Date>();
   const [formData, setFormData] = useState({
-    customerName: '',
-    billNumber: '',
-    materialType: '',
-    squareFoot: '',
-    ratePerSqft: ''
-  })
+    customerName: "",
+    billNumber: "",
+    materialType: "",
+    squareFoot: "",
+    ratePerSqft: "",
+  });
 
   const handleInputChange = (e: any) => {
-    const { name, value } = e.target
-    setFormData(prevState => ({
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
       ...prevState,
-      [name]: value.trim()
-    }))
-  }
+      [name]: value.trim(),
+    }));
+  };
 
   const handleSubmit = (e: any) => {
-    e.preventDefault()
-    console.log(bills, formData)
-    if (bills.some(bill => bill.billNumber === formData.billNumber)) {
-        alert("Bill with the same number already exists")
-        return
+    e.preventDefault();
+    console.log(bills, formData);
+    if (bills.some((bill) => bill.billNumber === formData.billNumber)) {
+      alert("Bill with the same number already exists");
+      return;
     }
-    onSubmit({ ...formData, date })
+    onSubmit({ ...formData, date });
     setFormData({
-      customerName: '',
-      billNumber: '',
-      materialType: '',
-      squareFoot: '',
-      ratePerSqft: ''
-    })
-    setDate(undefined)
-    setOpen(false)
-  }
+      customerName: "",
+      billNumber: "",
+      materialType: "",
+      squareFoot: "",
+      ratePerSqft: "",
+    });
+    setDate(undefined);
+    setOpen(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -68,11 +74,18 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] rounded-2xl border-[#E5E7EB] p-6">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-medium text-[#111827]">Add New Bill</DialogTitle>
+          <DialogTitle className="text-2xl font-medium text-[#111827]">
+            Add New Bill
+          </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div className="space-y-2">
-            <Label htmlFor="customerName" className="text-[#374151] font-medium">Customer Name</Label>
+            <Label
+              htmlFor="customerName"
+              className="text-[#374151] font-medium"
+            >
+              Customer Name
+            </Label>
             <Input
               id="customerName"
               name="customerName"
@@ -83,7 +96,9 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="date" className="text-[#374151] font-medium">Date</Label>
+            <Label htmlFor="date" className="text-[#374151] font-medium">
+              Date
+            </Label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -109,7 +124,9 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
             </Popover>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="billNumber" className="text-[#374151] font-medium">Bill Number</Label>
+            <Label htmlFor="billNumber" className="text-[#374151] font-medium">
+              Bill Number
+            </Label>
             <Input
               id="billNumber"
               name="billNumber"
@@ -120,7 +137,12 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="materialType" className="text-[#374151] font-medium">Type of Material</Label>
+            <Label
+              htmlFor="materialType"
+              className="text-[#374151] font-medium"
+            >
+              Type of Material
+            </Label>
             <Input
               id="materialType"
               name="materialType"
@@ -132,7 +154,12 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="squareFoot" className="text-[#374151] font-medium">Square Foot</Label>
+              <Label
+                htmlFor="squareFoot"
+                className="text-[#374151] font-medium"
+              >
+                Square Foot
+              </Label>
               <Input
                 id="squareFoot"
                 name="squareFoot"
@@ -144,7 +171,12 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="ratePerSqft" className="text-[#374151] font-medium">Rate per Sq.ft</Label>
+              <Label
+                htmlFor="ratePerSqft"
+                className="text-[#374151] font-medium"
+              >
+                Rate per Sq.ft
+              </Label>
               <Input
                 id="ratePerSqft"
                 name="ratePerSqft"
@@ -157,8 +189,8 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
               />
             </div>
           </div>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             className="w-full bg-gradient-to-r from-slate-800 to-gray-900 hover:from-slate-900 hover:to-gray-950 text-white rounded-lg mt-6"
           >
             Submit Bill
@@ -166,6 +198,5 @@ export function AddBillForm({ onSubmit, bills }: { onSubmit: (bill: any) => void
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-
