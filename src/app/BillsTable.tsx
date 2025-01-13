@@ -15,21 +15,20 @@ const BillsTable = ({ bills }: { bills: Bill[] }) => {
         <TableHeader>
           <TableRow className="bg-gradient-to-r from-slate-50 to-gray-50 hover:bg-gradient-to-r hover:from-slate-50 hover:to-gray-50">
             <TableHead className="w-[200px] py-4 text-[#4B5563 font-medium">
-              {" "}
-              Customer Name{" "}
+              Customer Name
             </TableHead>
             <TableHead className="text-[#4B5563 font-medium">
-              {" "}
-              Bill Number{" "}
+              Bill Number
             </TableHead>
             <TableHead className="text-[#4B5563 font-medium"> Date </TableHead>
             <TableHead className="text-[#4B5563 font-medium">
-              {" "}
-              Material{" "}
+              Labourer Name
             </TableHead>
             <TableHead className="text-[#4B5563 font-medium">
-              {" "}
-              Square Feet{" "}
+              Material
+            </TableHead>
+            <TableHead className="text-[#4B5563 font-medium">
+              Square Feet
             </TableHead>
             <TableHead className="text-[#4B5563 font-medium"> Rate </TableHead>
             <TableHead className="text-[#4B5563 font-medium"> Total </TableHead>
@@ -42,16 +41,17 @@ const BillsTable = ({ bills }: { bills: Bill[] }) => {
               className="hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB]"
             >
               <TableCell className="text-[#374151]">
-                {" "}
-                {bill.customerName}{" "}
+                {bill.customerName}
               </TableCell>
               <TableCell className="text-[#374151]">
-                {" "}
-                {bill.billNumber}{" "}
+                {bill.billNumber}
               </TableCell>
+
               <TableCell className="text-[#374151]">
-                {" "}
                 {bill.date.toLocaleDateString()}{" "}
+              </TableCell>
+              <TableCell className="text-[#374151]">
+                {bill.labourerName}
               </TableCell>
               <TableCell className="text-[#374151]">
                 <span className="inline-flex items-center rounded-full bg-gradient-to-r from-slate-100 to-gray-100 px-3 py-1 text-sm font-medium text-[#374151]">
@@ -59,16 +59,13 @@ const BillsTable = ({ bills }: { bills: Bill[] }) => {
                 </span>
               </TableCell>
               <TableCell className="text-[#374151]">
-                {" "}
-                {bill.ratePerSqft}{" "}
+                {bill.ratePerSqft}
               </TableCell>
               <TableCell className="text-[#374151]">
-                {" "}
-                {bill.squareFoot}{" "}
+                {bill.squareFoot}
               </TableCell>
               <TableCell className="text-[#374151]">
-                {" "}
-                {bill.squareFoot * bill.ratePerSqft}{" "}
+                {bill.squareFoot * bill.ratePerSqft}
               </TableCell>
             </TableRow>
           ))}

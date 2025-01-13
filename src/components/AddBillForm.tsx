@@ -28,13 +28,15 @@ export function AddBillForm({
   bills: Bill[];
 }) {
   const [open, setOpen] = useState(false);
-  const [date, setDate] = useState<Date>();
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Bill>({
     customerName: "",
     billNumber: "",
-    materialType: "",
-    squareFoot: "",
-    ratePerSqft: "",
+    labourerName: [""],
+    date: undefined,
+    materialType: [""],
+    squareFoot: [0],
+    ratePerSqft: [0],
+    total: undefined,
   });
 
   const handleInputChange = (e: any) => {
@@ -52,15 +54,17 @@ export function AddBillForm({
       alert("Bill with the same number already exists");
       return;
     }
-    onSubmit({ ...formData, date });
+    onSubmit(formData);
     setFormData({
       customerName: "",
       billNumber: "",
-      materialType: "",
-      squareFoot: "",
-      ratePerSqft: "",
+      date: undefined,
+      labourerName: [""],
+      materialType: [""],
+      squareFoot: [0],
+      ratePerSqft:[0],
+      total: undefined,
     });
-    setDate(undefined);
     setOpen(false);
   };
 
@@ -105,18 +109,18 @@ export function AddBillForm({
                   variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal rounded-lg border-[#E5E7EB]",
-                    !date && "text-[#9CA3AF]"
+                    !formData.date && "text-[#9CA3AF]"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  {formData.date ? format(formData.date, "PPP") : <span>Pick a date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 rounded-xl">
                 <Calendar
                   mode="single"
-                  selected={date}
-                  onSelect={setDate}
+                  selected={formData.date}
+                  onSelect={(newDate) => setFormData((prev) => ({ ...prev, date: newDate }))}
                   initialFocus
                   className="rounded-xl"
                 />
@@ -131,6 +135,22 @@ export function AddBillForm({
               id="billNumber"
               name="billNumber"
               value={formData.billNumber}
+              onChange={handleInputChange}
+              required
+              className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label
+              htmlFor="materialType"
+              className="text-[#374151] font-medium"
+            >
+              Labourer Name
+            </Label>
+            <Input
+              id="labourerName"
+              name="labourerName"
+              value={formData.labourerName}
               onChange={handleInputChange}
               required
               className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
