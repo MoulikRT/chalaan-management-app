@@ -1,13 +1,13 @@
 interface Bill {
-    customerName: string
+    customerName?: string
     billNumber: string
     chalaanNumber: string
-    date: Date | undefined
+    date?: Date
     labourerName: string[]
     materialType: string[]
     squareFoot: number[]
     ratePerSqft: number[]
-    total: number | undefined
+    total?: number
   }
 
 export default Bill

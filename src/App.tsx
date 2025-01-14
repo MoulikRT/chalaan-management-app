@@ -4,62 +4,70 @@ import "./App.css";
 import { AddBillForm } from "./components/AddBillForm";
 import Bill from "./types/bills.types";
 
-// Utility functions for localStorage
+// const testValues = [
+//   {
+//     customerName: "amazing test",
+//     billNumber: "BILL-001",
+//     chalaanNumber: "CH-001",
+//     labourerName: ["your", "mom"],
+//     date: new Date("2024-01-15"),
+//     materialType: ["Marble"],
+//     squareFoot: [100],
+//     ratePerSqft: [45.50],
+//     total: 4550
+//   },
+//   {
+//     customerName: "test awesome",
+//     billNumber: "BILL-002",
+//     chalaanNumber: "CH-002",
+//     labourerName: ["hello", "world"],
+//     date: new Date("2024-01-16"),
+//     materialType: ["Granite"],
+//     squareFoot: [75],
+//     ratePerSqft: [38.25],
+//     total: 2868.75
+//   }
+// ]
+
 const getInitialBills = (): Bill[] => {
-  const savedBills = localStorage.getItem('bills');
-  if (savedBills) {
-    // Convert date strings back to Date objects
-    return JSON.parse(savedBills).map((bill: Bill) => ({
-      ...bill,
-      date: new Date(bill.date)
-    }));
+  const savedBills = localStorage.getItem("bills");
+  if (!savedBills) {
+    return [];
   }
-  return [
-    // {
-    //   customerName: "John Doe",
-    //   billNumber: "BILL-001",
-    //   chalaanNumber: "CH-001",
-    //   labourerName: ["John", "Doe"],
-    //   date: new Date("2024-01-15"),
-    //   materialType: ["Marble"],
-    //   squareFoot: [100],
-    //   ratePerSqft: [45.50],
-    //   total: 4550
-    // },
-    // {
-    //   customerName: "Jane Smith",
-    //   billNumber: "BILL-002",
-    //   chalaanNumber: "CH-002",
-    //   labourerName: ["Jane", "Smith"],
-    //   date: new Date("2024-01-16"),
-    //   materialType: ["Granite"],
-    //   squareFoot: [75],
-    //   ratePerSqft: [38.25],
-    //   total: 2868.75
-    // }
-  ];
+  return JSON.parse(savedBills).map((bill: Bill) => {
+    if (!bill.date) {
+      return bill;
+    }
+    return {
+      ...bill,
+      date: new Date(bill.date),
+    };
+  });
 };
 
 function App() {
   const [bills, setBills] = useState<Bill[]>(getInitialBills());
 
-  // Save to localStorage whenever bills change
   useEffect(() => {
-    localStorage.setItem('bills', JSON.stringify(bills));
+    localStorage.setItem("bills", JSON.stringify(bills));
   }, [bills]);
 
   const handleAddBill = (newBill: Bill) => {
-    setBills(prev => [...prev, newBill])
-  }
+    setBills((prev) => [...prev, newBill]);
+  };
 
   const handleEditBill = (editedBill: Bill) => {
-    setBills(prev => prev.map(bill => 
-      bill.billNumber === editedBill.billNumber ? editedBill : bill
-    ));
+    setBills((prev) =>
+      prev.map((bill) =>
+        bill.billNumber === editedBill.billNumber ? editedBill : bill
+      )
+    );
   };
 
   const handleDeleteBill = (billToDelete: Bill) => {
-    setBills(prev => prev.filter(bill => bill.billNumber !== billToDelete.billNumber));
+    setBills((prev) =>
+      prev.filter((bill) => bill.billNumber !== billToDelete.billNumber)
+    );
   };
 
   return (
@@ -70,10 +78,10 @@ function App() {
             <h1 className="text-[2rem] font-medium text-[#111827]">Chalaans</h1>
             <p className="text-[#6B7280]">Manage and track your chalaans</p>
           </div>
-          <AddBillForm onSubmit={handleAddBill} bills={bills}/>
+          <AddBillForm onSubmit={handleAddBill} bills={bills} />
         </div>
-        <BillsTable 
-          bills={bills} 
+        <BillsTable
+          bills={bills}
           onEdit={handleEditBill}
           onDelete={handleDeleteBill}
         />

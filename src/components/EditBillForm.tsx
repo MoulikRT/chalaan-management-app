@@ -46,7 +46,6 @@ export function EditBillForm({
     chalaanNumber: "",
   });
 
-  // Reset form data when billToEdit changes
   useEffect(() => {
     setFormData(billToEdit);
   }, [billToEdit]);
@@ -54,7 +53,6 @@ export function EditBillForm({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Clear errors when user starts typing
     if (name === "billNumber" || name === "chalaanNumber") {
       setErrors(prev => ({
         ...prev,
@@ -68,7 +66,6 @@ export function EditBillForm({
         [name]: value.trim(),
       }));
 
-      // Validate as user types - exclude current bill from check
       if (name === "billNumber") {
         if (bills.some((bill) => bill.billNumber === value.trim() && bill.billNumber !== billToEdit.billNumber)) {
           setErrors(prev => ({
@@ -95,15 +92,32 @@ export function EditBillForm({
 
   const handleAddItem = (field: keyof typeof currentInputs) => {
     if (!currentInputs[field]) return;
+    const prevItems = formData[field as keyof Bill] as
+      | number[]
+      | string[]
+      | undefined;
+    if (prevItems) {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: [
+          ...prevItems,
+          field === "squareFoot" || field === "ratePerSqft"
+            ? Number(currentInputs[field])
+            : currentInputs[field],
+        ],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: [
+          field === "squareFoot" || field === "ratePerSqft"
+            ? Number(currentInputs[field])
+            : currentInputs[field],
+        ],
+      }));
+    }
 
-    setFormData((prev) => ({
-      ...prev,
-      [field]: [...prev[field as keyof Bill], 
-        field === "squareFoot" || field === "ratePerSqft" 
-          ? Number(currentInputs[field]) 
-          : currentInputs[field]
-      ],
-    }));
+    // console.log("currentInputs, formdata", currentInputs, formData);
 
     setCurrentInputs((prev) => ({
       ...prev,
@@ -112,16 +126,17 @@ export function EditBillForm({
   };
 
   const handleRemoveItem = (field: keyof Bill, index: number) => {
+    const previousItems = formData[field] as number[] | string[] | undefined;
+    if (!previousItems) return;
     setFormData((prev) => ({
       ...prev,
-      [field]: prev[field].filter((_, i) => i !== index),
+      [field]: previousItems.filter((_, i) => i !== index),
     }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validate before submission - exclude current bill from check
     const billNumberExists = bills.some((bill) => 
       bill.billNumber === formData.billNumber && bill.billNumber !== billToEdit.billNumber
     );
@@ -162,10 +177,8 @@ export function EditBillForm({
             </DialogTitle>
           </div>
         </DialogHeader>
-        {/* Rest of the form remains the same as AddBillForm, just change the submit button text */}
         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div className="grid grid-cols-2 gap-4">
-            {/* First Column */}
             <div className="space-y-2">
               <Label htmlFor="customerName" className="text-[#374151] font-medium">
                 Customer Name
@@ -180,7 +193,6 @@ export function EditBillForm({
               />
             </div>
 
-            {/* Second Column */}
             <div className="space-y-2">
               <Label htmlFor="date" className="text-[#374151] font-medium">
                 Date
@@ -210,8 +222,6 @@ export function EditBillForm({
               </Popover>
             </div>
 
-            {/* Bill Number and Chalaan Number */}
-            {/* Bill Number with Error */}
             <div className="space-y-2">
               <Label htmlFor="billNumber" className="text-[#374151] font-medium">
                 Bill Number
@@ -232,7 +242,6 @@ export function EditBillForm({
               )}
             </div>
 
-            {/* Chalaan Number with Error */}
             <div className="space-y-2">
               <Label htmlFor="chalaanNumber" className="text-[#374151] font-medium">
                 Chalaan Number
@@ -255,7 +264,6 @@ export function EditBillForm({
 
           </div>
 
-          {/* Dynamic Fields Grid */}
           <div className="grid grid-cols-2 gap-4">
             {["labourerName", "materialType", "squareFoot", "ratePerSqft"].map((field) => (
               <div key={field} className="space-y-2">
@@ -280,7 +288,7 @@ export function EditBillForm({
                   </Button>
                 </div>
                 <div className="flex flex-wrap gap-2 mt-2">
-                  {formData[field as keyof Bill].map((item: string | number, index: number) => (
+                  {formData[field as "labourerName" | "materialType" | "squareFoot" | "ratePerSqft"].map((item: string | number, index: number) => (
                     <span
                       key={index}
                       className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full flex items-center gap-2"
@@ -300,7 +308,6 @@ export function EditBillForm({
             ))}
           </div>
 
-          {/* Total */}
           <div className="w-full">
             <Label htmlFor="total" className="text-[#374151] font-medium">
               Total
