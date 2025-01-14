@@ -6,32 +6,41 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import Bill from "./bills.types";
+import Bill from "@/types/bills.types";
+import { EditBillForm } from "@/components/EditBillForm";
 
-const BillsTable = ({ bills }: { bills: Bill[] }) => {
+const BillsTable = ({ bills, onEdit, onDelete }: { 
+  bills: Bill[];
+  onEdit: (bill: Bill) => void;
+  onDelete: (bill: Bill) => void;
+}) => {
   return (
     <div className="rounded border border-[#e5e7eb66] bg-white overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow className="bg-gradient-to-r from-slate-50 to-gray-50 hover:bg-gradient-to-r hover:from-slate-50 hover:to-gray-50">
-            <TableHead className="w-[200px] py-4 text-[#4B5563 font-medium">
+            <TableHead className="w-[200px] py-4 text-[#4B5563] font-medium">
               Customer Name
             </TableHead>
-            <TableHead className="text-[#4B5563 font-medium">
+            <TableHead className="text-[#4B5563] font-medium">
               Bill Number
             </TableHead>
-            <TableHead className="text-[#4B5563 font-medium"> Date </TableHead>
-            <TableHead className="text-[#4B5563 font-medium">
-              Labourer Name
+            <TableHead className="text-[#4B5563] font-medium">
+              Chalaan Number
             </TableHead>
-            <TableHead className="text-[#4B5563 font-medium">
-              Material
+            <TableHead className="text-[#4B5563] font-medium">Date</TableHead>
+            <TableHead className="text-[#4B5563] font-medium">
+              Labourer(s) Name
             </TableHead>
-            <TableHead className="text-[#4B5563 font-medium">
-              Square Feet
+            <TableHead className="text-[#4B5563] font-medium">
+              Material(s) Type
             </TableHead>
-            <TableHead className="text-[#4B5563 font-medium"> Rate </TableHead>
-            <TableHead className="text-[#4B5563 font-medium"> Total </TableHead>
+            <TableHead className="text-[#4B5563] font-medium">
+              Square Feet(s)
+            </TableHead>
+            <TableHead className="text-[#4B5563] font-medium">Rate(s)</TableHead>
+            <TableHead className="text-[#4B5563] font-medium">Total</TableHead>
+            <TableHead className="text-[#4B5563] font-medium">Edit</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -46,26 +55,79 @@ const BillsTable = ({ bills }: { bills: Bill[] }) => {
               <TableCell className="text-[#374151]">
                 {bill.billNumber}
               </TableCell>
-
               <TableCell className="text-[#374151]">
-                {bill.date.toLocaleDateString()}{" "}
+                {bill.chalaanNumber}
               </TableCell>
               <TableCell className="text-[#374151]">
-                {bill.labourerName}
+                {bill.date?.toLocaleDateString()}
               </TableCell>
+              
+              {/* Labourer Names Cell */}
               <TableCell className="text-[#374151]">
-                <span className="inline-flex items-center rounded-full bg-gradient-to-r from-slate-100 to-gray-100 px-3 py-1 text-sm font-medium text-[#374151]">
-                  {bill.materialType}
-                </span>
+                <div className="space-y-1">
+                  {bill.labourerName.map((name, idx) => (
+                    <span
+                      key={idx}
+                      className="block px-2 py-1 rounded-md bg-slate-50"
+                    >
+                      {name}
+                    </span>
+                  ))}
+                </div>
               </TableCell>
+              
+              {/* Material Types Cell */}
               <TableCell className="text-[#374151]">
-                {bill.ratePerSqft}
+                <div className="space-y-1">
+                  {bill.materialType.map((material, idx) => (
+                    <span
+                      key={idx}
+                      className="block px-2 py-1 rounded-full bg-gradient-to-r from-slate-100 to-gray-100 text-sm"
+                    >
+                      {material}
+                    </span>
+                  ))}
+                </div>
               </TableCell>
+              
+              {/* Square Feet Cell */}
               <TableCell className="text-[#374151]">
-                {bill.squareFoot}
+                <div className="space-y-1">
+                  {bill.squareFoot.map((sqft, idx) => (
+                    <span
+                      key={idx}
+                      className="block px-2 py-1 rounded-md bg-slate-50"
+                    >
+                      {sqft.toLocaleString()}
+                    </span>
+                  ))}
+                </div>
               </TableCell>
+              
+              {/* Rate Per Sqft Cell */}
               <TableCell className="text-[#374151]">
-                {bill.squareFoot * bill.ratePerSqft}
+                <div className="space-y-1">
+                  {bill.ratePerSqft.map((rate, idx) => (
+                    <span
+                      key={idx}
+                      className="block px-2 py-1 rounded-md bg-slate-50"
+                    >
+                      ₹{rate.toLocaleString()}
+                    </span>
+                  ))}
+                </div>
+              </TableCell>
+              
+              <TableCell className="text-[#374151]">
+                {bill.total?.toLocaleString()}
+              </TableCell>
+              <TableCell>
+                <EditBillForm 
+                  onSubmit={onEdit} 
+                  onDelete={onDelete}
+                  bills={bills} 
+                  billToEdit={bill}
+                />
               </TableCell>
             </TableRow>
           ))}
