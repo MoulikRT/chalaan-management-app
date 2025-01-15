@@ -26,11 +26,13 @@ export function EditBillForm({
   onDelete,
   bills,
   billToEdit,
-}: {
+}: // setSearchTerm,
+{
   onSubmit: (bill: Bill) => void;
   onDelete: (bill: Bill) => void;
   bills: Bill[];
   billToEdit: Bill;
+  // setSearchTerm: (term: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [currentInputs, setCurrentInputs] = useState({
@@ -52,34 +54,49 @@ export function EditBillForm({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    
+
     if (name === "billNumber" || name === "chalaanNumber") {
-      setErrors(prev => ({
+      setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
     }
 
-    if (["customerName", "billNumber", "chalaanNumber", "total"].includes(name)) {
+    if (
+      ["customerName", "billNumber", "chalaanNumber", "total"].includes(name)
+    ) {
       setFormData((prev) => ({
         ...prev,
         [name]: value.trim(),
       }));
 
       if (name === "billNumber") {
-        if (bills.some((bill) => bill.billNumber === value.trim() && bill.billNumber !== billToEdit.billNumber)) {
-          setErrors(prev => ({
+        if (
+          bills.some(
+            (bill) =>
+              bill.billNumber === value.trim() &&
+              bill.billNumber !== billToEdit.billNumber
+          )
+        ) {
+          setErrors((prev) => ({
             ...prev,
-            billNumber: "This bill number already exists",
+            billNumber: `This bill number already exists at index ${
+              bills.findIndex((bill) => bill.billNumber === value.trim()) + 1
+            }.`,
           }));
+          // setSearchTerm(value.trim());
         }
       }
       if (name === "chalaanNumber") {
-        if (bills.some((bill) => bill.chalaanNumber === value.trim() && bill.chalaanNumber !== billToEdit.chalaanNumber)) {
-          setErrors(prev => ({
+        if (bills.some((bill) => bill.chalaanNumber === value.trim() &&
+        bill.chalaanNumber !== billToEdit.chalaanNumber)) {
+          setErrors((prev) => ({
             ...prev,
-            chalaanNumber: "This chalaan number already exists",
+            chalaanNumber: `This chalaan number already exists at index ${
+              bills.findIndex((bill) => bill.chalaanNumber === value.trim()) + 1
+            }.`,
           }));
+          // setSearchTerm(value.trim());
         }
       }
     } else {
@@ -136,18 +153,25 @@ export function EditBillForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const billNumberExists = bills.some((bill) => 
-      bill.billNumber === formData.billNumber && bill.billNumber !== billToEdit.billNumber
+    // console.log(formData);
+
+    const billNumberExists = bills.some(
+      (bill) =>
+        bill.billNumber === formData.billNumber &&
+        bill.billNumber !== billToEdit.billNumber
     );
-    const chalaanNumberExists = bills.some((bill) => 
-      bill.chalaanNumber === formData.chalaanNumber && bill.chalaanNumber !== billToEdit.chalaanNumber
+    const chalaanNumberExists = bills.some(
+      (bill) =>
+        bill.chalaanNumber === formData.chalaanNumber &&
+        bill.chalaanNumber !== billToEdit.chalaanNumber
     );
-    
+
     if (billNumberExists || chalaanNumberExists) {
       setErrors({
         billNumber: billNumberExists ? "This bill number already exists" : "",
-        chalaanNumber: chalaanNumberExists ? "This chalaan number already exists" : "",
+        chalaanNumber: chalaanNumberExists
+          ? "This chalaan number already exists"
+          : "",
       });
       return;
     }
@@ -169,7 +193,7 @@ export function EditBillForm({
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6">
+      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6" >
         <DialogHeader>
           <div className="flex justify-between items-center">
             <DialogTitle className="text-2xl font-medium text-[#111827]">
@@ -180,7 +204,10 @@ export function EditBillForm({
         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="customerName" className="text-[#374151] font-medium">
+              <Label
+                htmlFor="customerName"
+                className="text-[#374151] font-medium"
+              >
                 Customer Name
               </Label>
               <Input
@@ -188,7 +215,6 @@ export function EditBillForm({
                 name="customerName"
                 value={formData.customerName}
                 onChange={handleInputChange}
-                required
                 className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
               />
             </div>
@@ -207,14 +233,20 @@ export function EditBillForm({
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.date ? format(formData.date, "PPP") : <span>Pick a date</span>}
+                    {formData.date ? (
+                      format(formData.date, "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0 rounded-xl">
                   <Calendar
                     mode="single"
                     selected={formData.date}
-                    onSelect={(newDate) => setFormData((prev) => ({ ...prev, date: newDate }))}
+                    onSelect={(newDate) =>
+                      setFormData((prev) => ({ ...prev, date: newDate }))
+                    }
                     initialFocus
                     className="rounded-xl"
                   />
@@ -223,7 +255,10 @@ export function EditBillForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="billNumber" className="text-[#374151] font-medium">
+              <Label
+                htmlFor="billNumber"
+                className="text-[#374151] font-medium"
+              >
                 Bill Number
               </Label>
               <Input
@@ -234,7 +269,8 @@ export function EditBillForm({
                 required
                 className={cn(
                   "rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400",
-                  errors.billNumber && "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  errors.billNumber &&
+                    "border-red-500 focus:border-red-500 focus:ring-red-500"
                 )}
               />
               {errors.billNumber && (
@@ -243,7 +279,10 @@ export function EditBillForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="chalaanNumber" className="text-[#374151] font-medium">
+              <Label
+                htmlFor="chalaanNumber"
+                className="text-[#374151] font-medium"
+              >
                 Chalaan Number
               </Label>
               <Input
@@ -254,58 +293,77 @@ export function EditBillForm({
                 required
                 className={cn(
                   "rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400",
-                  errors.chalaanNumber && "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  errors.chalaanNumber &&
+                    "border-red-500 focus:border-red-500 focus:ring-red-500"
                 )}
               />
               {errors.chalaanNumber && (
-                <p className="text-sm text-red-500 mt-1">{errors.chalaanNumber}</p>
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.chalaanNumber}
+                </p>
               )}
             </div>
-
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            {["labourerName", "materialType", "squareFoot", "ratePerSqft"].map((field) => (
-              <div key={field} className="space-y-2">
-                <Label htmlFor={field} className="text-[#374151] font-medium">
-                  {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
-                </Label>
-                <div className="flex gap-2">
-                  <Input
-                    id={field}
-                    name={field}
-                    type={field === "squareFoot" || field === "ratePerSqft" ? "number" : "text"}
-                    value={currentInputs[field as keyof typeof currentInputs]}
-                    onChange={handleInputChange}
-                    className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
-                  />
-                  <Button
-                    type="button"
-                    onClick={() => handleAddItem(field as keyof typeof currentInputs)}
-                    className="px-3 bg-slate-800"
-                  >
-                    Add
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData[field as "labourerName" | "materialType" | "squareFoot" | "ratePerSqft"].map((item: string | number, index: number) => (
-                    <span
-                      key={index}
-                      className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full flex items-center gap-2"
+            {["labourerName", "materialType", "squareFoot", "ratePerSqft"].map(
+              (field) => (
+                <div key={field} className="space-y-2">
+                  <Label htmlFor={field} className="text-[#374151] font-medium">
+                    {field.charAt(0).toUpperCase() +
+                      field.slice(1).replace(/([A-Z])/g, " $1")}
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id={field}
+                      name={field}
+                      type={
+                        field === "squareFoot" || field === "ratePerSqft"
+                          ? "number"
+                          : "text"
+                      }
+                      value={currentInputs[field as keyof typeof currentInputs]}
+                      onChange={handleInputChange}
+                      className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() =>
+                        handleAddItem(field as keyof typeof currentInputs)
+                      }
+                      className="px-3 bg-slate-800"
                     >
-                      {item}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(field as keyof Bill, index)}
-                        className="text-slate-500 hover:text-slate-700"
+                      Add
+                    </Button>
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {formData[
+                      field as
+                        | "labourerName"
+                        | "materialType"
+                        | "squareFoot"
+                        | "ratePerSqft"
+                    ].map((item: string | number, index: number) => (
+                      <span
+                        key={index}
+                        className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full flex items-center gap-2"
                       >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </span>
-                  ))}
+                        {item}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleRemoveItem(field as keyof Bill, index)
+                          }
+                          className="text-slate-500 hover:text-slate-700"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
 
           <div className="w-full">
@@ -317,20 +375,24 @@ export function EditBillForm({
               name="total"
               value={formData.total}
               onChange={handleInputChange}
-              required
               className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
             />
           </div>
-
-          <Button
-            type="submit"
-            className="w-full bg-gradient-to-r from-slate-800 to-gray-900 hover:from-slate-900 hover:to-gray-950 text-white rounded-lg mt-6"
-          >
-            Update Bill
-          </Button>
-          <Button variant="destructive" className="w-full" onClick={handleDelete}>
+          <div className="flex gap-4">
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={handleDelete}
+            >
               <Trash2 className="h-4 w-4" /> Delete Bill
             </Button>
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-slate-800 to-gray-900 hover:from-slate-900 hover:to-gray-950 text-white rounded-lg"
+            >
+              Update Bill
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

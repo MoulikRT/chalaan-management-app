@@ -23,9 +23,11 @@ import Bill from "@/types/bills.types";
 export function AddBillForm({
   onSubmit,
   bills,
+  setSearchTerm,
 }: {
   onSubmit: (bill: Bill) => void;
   bills: Bill[];
+  setSearchTerm: (term: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [currentInputs, setCurrentInputs] = useState({
@@ -74,16 +76,22 @@ export function AddBillForm({
         if (bills.some((bill) => bill.billNumber === value.trim())) {
           setErrors((prev) => ({
             ...prev,
-            billNumber: "This bill number already exists",
+            billNumber: `This bill number already exists at index ${
+              bills.findIndex((bill) => bill.billNumber === value.trim()) + 1
+            }.`,
           }));
+          setSearchTerm(value.trim());
         }
       }
       if (name === "chalaanNumber") {
         if (bills.some((bill) => bill.chalaanNumber === value.trim())) {
           setErrors((prev) => ({
             ...prev,
-            chalaanNumber: "This chalaan number already exists",
+            chalaanNumber: `This chalaan number already exists at index ${
+              bills.findIndex((bill) => bill.chalaanNumber === value.trim()) + 1
+            }.`,
           }));
+          setSearchTerm(value.trim());
         }
       }
     } else {
@@ -183,7 +191,7 @@ export function AddBillForm({
           Add New Bill
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6">
+      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6" >
         <DialogHeader>
           <DialogTitle className="text-2xl font-medium text-[#111827]">
             Add New Bill
@@ -191,7 +199,6 @@ export function AddBillForm({
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-6">
           <div className="grid grid-cols-2 gap-4">
-            {/* First Column */}
             <div className="space-y-2">
               <Label
                 htmlFor="customerName"
@@ -204,12 +211,10 @@ export function AddBillForm({
                 name="customerName"
                 value={formData.customerName}
                 onChange={handleInputChange}
-                required
                 className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
               />
             </div>
 
-            {/* Second Column */}
             <div className="space-y-2">
               <Label htmlFor="date" className="text-[#374151] font-medium">
                 Date
@@ -245,8 +250,6 @@ export function AddBillForm({
               </Popover>
             </div>
 
-            {/* Bill Number and Chalaan Number */}
-            {/* Bill Number with Error */}
             <div className="space-y-2">
               <Label
                 htmlFor="billNumber"
@@ -331,25 +334,29 @@ export function AddBillForm({
                     </Button>
                   </div>
                   <div className="flex flex-wrap gap-2 mt-2">
-                    {formData[field as "labourerName" | "materialType" | "squareFoot" | "ratePerSqft"]?.map(
-                      (item: string | number, index: number) => (
-                        <span
-                          key={index}
-                          className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full flex items-center gap-2"
+                    {formData[
+                      field as
+                        | "labourerName"
+                        | "materialType"
+                        | "squareFoot"
+                        | "ratePerSqft"
+                    ]?.map((item: string | number, index: number) => (
+                      <span
+                        key={index}
+                        className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full flex items-center gap-2"
+                      >
+                        {item}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleRemoveItem(field as keyof Bill, index)
+                          }
+                          className="text-slate-500 hover:text-slate-700"
                         >
-                          {item}
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleRemoveItem(field as keyof Bill, index)
-                            }
-                            className="text-slate-500 hover:text-slate-700"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        </span>
-                      )
-                    )}
+                          <X className="h-4 w-4" />
+                        </button>
+                      </span>
+                    ))}
                   </div>
                 </div>
               )
@@ -365,7 +372,6 @@ export function AddBillForm({
               name="total"
               value={formData.total}
               onChange={handleInputChange}
-              required
               className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
             />
           </div>

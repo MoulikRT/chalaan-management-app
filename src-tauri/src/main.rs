@@ -2,5 +2,5 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 fn main() {
-    chalan_project_lib::run()
+    chalaan_manager_lib::run()
 }

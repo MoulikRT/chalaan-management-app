@@ -47,6 +47,7 @@ const getInitialBills = (): Bill[] => {
 
 function App() {
   const [bills, setBills] = useState<Bill[]>(getInitialBills());
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     localStorage.setItem("bills", JSON.stringify(bills));
@@ -56,10 +57,10 @@ function App() {
     setBills((prev) => [...prev, newBill]);
   };
 
-  const handleEditBill = (editedBill: Bill) => {
+  const handleEditBill = (editedBill: Bill, billToEdit: Bill) => {
     setBills((prev) =>
       prev.map((bill) =>
-        bill.billNumber === editedBill.billNumber ? editedBill : bill
+        bill.billNumber === billToEdit.billNumber ? editedBill : bill
       )
     );
   };
@@ -78,12 +79,18 @@ function App() {
             <h1 className="text-[2rem] font-medium text-[#111827]">Chalaans</h1>
             <p className="text-[#6B7280]">Manage and track your chalaans</p>
           </div>
-          <AddBillForm onSubmit={handleAddBill} bills={bills} />
+          <AddBillForm
+            onSubmit={handleAddBill}
+            bills={bills}
+            setSearchTerm={setSearchTerm}
+          />
         </div>
         <BillsTable
           bills={bills}
           onEdit={handleEditBill}
           onDelete={handleDeleteBill}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
         />
       </div>
     </main>

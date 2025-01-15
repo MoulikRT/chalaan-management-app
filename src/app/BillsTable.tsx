@@ -9,25 +9,26 @@ import {
 import Bill from "@/types/bills.types";
 import { EditBillForm } from "@/components/EditBillForm";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 
 const BillsTable = ({
   bills,
   onEdit,
   onDelete,
+  searchTerm,
+  setSearchTerm,
 }: {
   bills: Bill[];
-  onEdit: (bill: Bill) => void;
+  onEdit: (bill: Bill, billToEdit: Bill) => void;
   onDelete: (bill: Bill) => void;
+  searchTerm: string;
+  setSearchTerm: (term: string) => void;
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
-  
   const filteredBills = bills.filter(
     (bill) =>
       bill.billNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
       bill.chalaanNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   return (
     <>
       <Input
@@ -40,18 +41,21 @@ const BillsTable = ({
         <Table>
           <TableHeader>
             <TableRow className="bg-gradient-to-r from-slate-50 to-gray-50 hover:bg-gradient-to-r hover:from-slate-50 hover:to-gray-50">
-              <TableHead className="w-[200px] py-4 text-[#4B5563] font-medium">
-                Customer Name
+              <TableHead className="w-[5rem] py-4 text-[#4B5563] font-medium">
+                S. No.
+              </TableHead>
+              <TableHead className="text-[#4B5563] font-medium">Date</TableHead>
+              <TableHead className="text-[#4B5563] font-medium">
+                Chalaan Number
               </TableHead>
               <TableHead className="text-[#4B5563] font-medium">
                 Bill Number
               </TableHead>
               <TableHead className="text-[#4B5563] font-medium">
-                Chalaan Number
-              </TableHead>
-              <TableHead className="text-[#4B5563] font-medium">Date</TableHead>
-              <TableHead className="text-[#4B5563] font-medium">
                 Labourer(s) Name
+              </TableHead>
+              <TableHead className="w-[200px] py-4 text-[#4B5563] font-medium">
+                Customer Name
               </TableHead>
               <TableHead className="text-[#4B5563] font-medium">
                 Material(s) Type
@@ -75,19 +79,19 @@ const BillsTable = ({
                 className="hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB]"
               >
                 <TableCell className="text-[#374151]">
-                  {bill.customerName}
+                  {bills.indexOf(bill) + 1}
                 </TableCell>
+
                 <TableCell className="text-[#374151]">
-                  {bill.billNumber}
+                  {bill.date?.toLocaleDateString()}
                 </TableCell>
                 <TableCell className="text-[#374151]">
                   {bill.chalaanNumber}
                 </TableCell>
-                <TableCell className="text-[#374151]">
-                  {bill.date?.toLocaleDateString()}
-                </TableCell>
 
-                {/* Labourer Names Cell */}
+                <TableCell className="text-[#374151]">
+                  {bill.billNumber}
+                </TableCell>
                 <TableCell className="text-[#374151]">
                   <div className="space-y-1">
                     {bill.labourerName.map((name, idx) => (
@@ -100,8 +104,10 @@ const BillsTable = ({
                     ))}
                   </div>
                 </TableCell>
+                <TableCell className="text-[#374151]">
+                  {bill.customerName}
+                </TableCell>
 
-                {/* Material Types Cell */}
                 <TableCell className="text-[#374151]">
                   <div className="space-y-1">
                     {bill.materialType.map((material, idx) => (
@@ -115,7 +121,6 @@ const BillsTable = ({
                   </div>
                 </TableCell>
 
-                {/* Square Feet Cell */}
                 <TableCell className="text-[#374151]">
                   <div className="space-y-1">
                     {bill.squareFoot.map((sqft, idx) => (
@@ -129,7 +134,6 @@ const BillsTable = ({
                   </div>
                 </TableCell>
 
-                {/* Rate Per Sqft Cell */}
                 <TableCell className="text-[#374151]">
                   <div className="space-y-1">
                     {bill.ratePerSqft.map((rate, idx) => (
@@ -148,10 +152,11 @@ const BillsTable = ({
                 </TableCell>
                 <TableCell>
                   <EditBillForm
-                    onSubmit={onEdit}
+                    onSubmit={(editedBill) => onEdit(editedBill, bill)}
                     onDelete={onDelete}
                     bills={bills}
                     billToEdit={bill}
+                    // setSearchTerm={setSearchTerm}
                   />
                 </TableCell>
               </TableRow>
