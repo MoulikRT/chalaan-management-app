@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Chalaan Managemer",
+  "productName": "Chalaan Manager",
   "version": "1.0.0",
   "identifier": "com.chalaan-manager.app",
   "build": {
