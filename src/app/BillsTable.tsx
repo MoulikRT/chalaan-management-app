@@ -26,7 +26,9 @@ const BillsTable = ({
   const filteredBills = bills.filter(
     (bill) =>
       bill.billNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bill.chalaanNumber.toLowerCase().includes(searchTerm.toLowerCase())
+      bill.chalaanNumber.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      bill.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      bill.labourerName?.join().toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -128,7 +130,7 @@ const BillsTable = ({
                         key={idx}
                         className="block px-2 py-1 rounded-md bg-slate-50"
                       >
-                        {sqft.toLocaleString()}
+                        {sqft}
                       </span>
                     ))}
                   </div>
@@ -141,7 +143,7 @@ const BillsTable = ({
                         key={idx}
                         className="block px-2 py-1 rounded-md bg-slate-50"
                       >
-                        ₹{rate.toLocaleString()}
+                        {rate}
                       </span>
                     ))}
                   </div>

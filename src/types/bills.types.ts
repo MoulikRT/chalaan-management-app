@@ -5,8 +5,8 @@ interface Bill {
     date?: Date
     labourerName: string[]
     materialType: string[]
-    squareFoot: number[]
-    ratePerSqft: number[]
+    squareFoot: string[]
+    ratePerSqft: string[]
     total?: number
   }
 

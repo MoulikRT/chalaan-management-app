@@ -116,30 +116,16 @@ export function EditBillForm({
     if (prevItems) {
       setFormData((prev) => ({
         ...prev,
-        [field]: [
-          ...prevItems,
-          field === "squareFoot" || field === "ratePerSqft"
-            ? Number(currentInputs[field])
-            : currentInputs[field],
-        ],
+        [field]: [currentInputs[field]],
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [field]: [
-          field === "squareFoot" || field === "ratePerSqft"
-            ? Number(currentInputs[field])
-            : currentInputs[field],
-        ],
+        [field]: [currentInputs[field]],
       }));
     }
 
     // console.log("currentInputs, formdata", currentInputs, formData);
-
-    setCurrentInputs((prev) => ({
-      ...prev,
-      [field]: "",
-    }));
   };
 
   const handleRemoveItem = (field: keyof Bill, index: number) => {
@@ -317,11 +303,6 @@ export function EditBillForm({
                     <Input
                       id={field}
                       name={field}
-                      type={
-                        field === "squareFoot" || field === "ratePerSqft"
-                          ? "number"
-                          : "text"
-                      }
                       value={currentInputs[field as keyof typeof currentInputs]}
                       onChange={handleInputChange}
                       className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
