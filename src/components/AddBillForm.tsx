@@ -35,11 +35,12 @@ export function AddBillForm({
     materialType: "",
     squareFoot: "",
     ratePerSqft: "",
+    chalaanNumbers: "",
   });
   const [formData, setFormData] = useState<Bill>({
     customerName: "",
     billNumber: "",
-    chalaanNumber: "",
+    chalaanNumbers: [],
     labourerName: [],
     date: undefined,
     materialType: [],
@@ -50,22 +51,20 @@ export function AddBillForm({
 
   const [errors, setErrors] = useState({
     billNumber: "",
-    chalaanNumber: "",
+    chalaanNumbers: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if (name === "billNumber" || name === "chalaanNumber") {
+    if (name === "billNumber" || name === "chalaanNumbers") {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
     }
 
-    if (
-      ["customerName", "billNumber", "chalaanNumber", "total"].includes(name)
-    ) {
+    if (["customerName", "billNumber", "total"].includes(name)) {
       setFormData((prev) => ({
         ...prev,
         [name]: value.trim(),
@@ -83,23 +82,14 @@ export function AddBillForm({
           setSearchTerm(value.trim());
         }
       }
-      if (name === "chalaanNumber") {
-        if (bills.some((bill) => bill.chalaanNumber === value.trim())) {
-          setErrors((prev) => ({
-            ...prev,
-            chalaanNumber: `This chalaan number already exists at index ${
-              bills.findIndex((bill) => bill.chalaanNumber === value.trim()) + 1
-            }.`,
-          }));
-          setSearchTerm(value.trim());
-        }
-      }
-    } else {
+    }
+    else {
       setCurrentInputs((prev) => ({
         ...prev,
         [name]: value,
       }));
     }
+
   };
 
   const handleAddItem = (field: keyof typeof currentInputs) => {
@@ -108,25 +98,49 @@ export function AddBillForm({
       | number[]
       | string[]
       | undefined;
+      if (field === "chalaanNumbers") {
+        if (formData.chalaanNumbers.includes(currentInputs["chalaanNumbers"].trim())) {
+          setErrors((prev) => ({
+            ...prev,
+            chalaanNumbers: `This chalaan number "${currentInputs["chalaanNumbers"]}" already exists in current items.`,
+          }));
+          setSearchTerm(currentInputs["chalaanNumbers"].trim());
+          return
+        }
+        if (
+          bills.some((bill) =>
+            bill.chalaanNumbers.some(
+              (chalaanNumber) => {return chalaanNumber === currentInputs["chalaanNumbers"].trim()}
+            )
+          )
+        ) {
+          setErrors((prev) => ({
+            ...prev,
+            chalaanNumbers: `This chalaan number already exists at index ${
+              bills.findIndex((bill) =>
+                bill.chalaanNumbers.some(
+                  (chalaanNumber) => chalaanNumber === currentInputs["chalaanNumbers"].trim()
+                )
+              ) + 1
+            }.`,
+          }));
+          setSearchTerm(currentInputs["chalaanNumbers"].trim());
+          return
+        }
+      } 
     if (prevItems) {
       setFormData((prev) => ({
         ...prev,
-        [field]: [
-          ...prevItems,
-          currentInputs[field]
-        ],
+        [field]: [...prevItems, currentInputs[field]],
       }));
     } else {
       setFormData((prev) => ({
         ...prev,
-        [field]: [
-          currentInputs[field]
-        ],
+        [field]: [currentInputs[field]],
       }));
     }
 
     // console.log("currentInputs, formdata", currentInputs, formData);
-
   };
 
   const handleRemoveItem = (field: keyof Bill, index: number) => {
@@ -145,14 +159,18 @@ export function AddBillForm({
     const billNumberExists = bills.some(
       (bill) => bill.billNumber === formData.billNumber
     );
-    const chalaanNumberExists = bills.some(
-      (bill) => bill.chalaanNumber === formData.chalaanNumber
-    );
+    const chalaanNumberExists = bills
+      .flatMap((bill) => bill.chalaanNumbers)
+      .some((chalaanNumber) =>
+        formData.chalaanNumbers.some(
+          (formChalaanNumber) => chalaanNumber === formChalaanNumber
+        )
+      );
 
     if (billNumberExists || chalaanNumberExists) {
       setErrors({
         billNumber: billNumberExists ? "This bill number already exists" : "",
-        chalaanNumber: chalaanNumberExists
+        chalaanNumbers: chalaanNumberExists
           ? "This chalaan number already exists"
           : "",
       });
@@ -163,7 +181,7 @@ export function AddBillForm({
     setFormData({
       customerName: "",
       billNumber: "",
-      chalaanNumber: "",
+      chalaanNumbers: [],
       date: undefined,
       labourerName: [],
       materialType: [],
@@ -171,7 +189,7 @@ export function AddBillForm({
       ratePerSqft: [],
       total: undefined,
     });
-    setErrors({ billNumber: "", chalaanNumber: "" });
+    setErrors({ billNumber: "", chalaanNumbers: "" });
     setOpen(false);
   };
 
@@ -183,7 +201,7 @@ export function AddBillForm({
           Add New Bill
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6" >
+      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6">
         <DialogHeader>
           <DialogTitle className="text-2xl font-medium text-[#111827]">
             Add New Bill
@@ -269,28 +287,59 @@ export function AddBillForm({
             {/* Chalaan Number with Error */}
             <div className="space-y-2">
               <Label
-                htmlFor="chalaanNumber"
+                htmlFor="chalaanNumbers"
                 className="text-[#374151] font-medium"
               >
-                Chalaan Number
+                Chalaan Number(s)
               </Label>
-              <Input
-                id="chalaanNumber"
-                name="chalaanNumber"
-                value={formData.chalaanNumber}
-                onChange={handleInputChange}
-                required
-                className={cn(
-                  "rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400",
-                  errors.chalaanNumber &&
-                    "border-red-500 focus:border-red-500 focus:ring-red-500"
-                )}
-              />
-              {errors.chalaanNumber && (
+              <div className="flex gap-2">
+                <Input
+                  id={"chalaanNumbers"}
+                  name={"chalaanNumbers"}
+                  value={
+                    currentInputs[
+                      "chalaanNumbers" as keyof typeof currentInputs
+                    ]
+                  }
+                  onChange={handleInputChange}
+                  className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
+                />
+                <Button
+                  type="button"
+                  onClick={() =>
+                    handleAddItem(
+                      "chalaanNumbers" as keyof typeof currentInputs
+                    )
+                  }
+                  className="px-3 bg-slate-800"
+                >
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.chalaanNumbers?.map((item: string, index: number) => (
+                  <span
+                    key={index}
+                    className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full flex items-center gap-2"
+                  >
+                    {item}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRemoveItem("chalaanNumbers" as keyof Bill, index)
+                      }
+                      className="text-slate-500 hover:text-slate-700"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </span>
+                ))}
+              {errors.chalaanNumbers && (
                 <p className="text-sm text-red-500 mt-1">
-                  {errors.chalaanNumber}
+                  {errors.chalaanNumbers}
                 </p>
               )}
+              </div>
             </div>
           </div>
 

@@ -40,12 +40,13 @@ export function EditBillForm({
     materialType: "",
     squareFoot: "",
     ratePerSqft: "",
+    chalaanNumbers: "",
   });
   const [formData, setFormData] = useState<Bill>(billToEdit);
 
   const [errors, setErrors] = useState({
     billNumber: "",
-    chalaanNumber: "",
+    chalaanNumbers: "",
   });
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export function EditBillForm({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if (name === "billNumber" || name === "chalaanNumber") {
+    if (name === "billNumber" || name === "chalaanNumbers") {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
@@ -63,7 +64,7 @@ export function EditBillForm({
     }
 
     if (
-      ["customerName", "billNumber", "chalaanNumber", "total"].includes(name)
+      ["customerName", "billNumber", "total"].includes(name)
     ) {
       setFormData((prev) => ({
         ...prev,
@@ -84,19 +85,26 @@ export function EditBillForm({
               bills.findIndex((bill) => bill.billNumber === value.trim()) + 1
             }.`,
           }));
-          // setSearchTerm(value.trim());
         }
       }
-      if (name === "chalaanNumber") {
-        if (bills.some((bill) => bill.chalaanNumber === value.trim() &&
-        bill.chalaanNumber !== billToEdit.chalaanNumber)) {
+      if (name === "chalaanNumbers") {
+        if (
+          bills.some((bill) =>
+            bill.chalaanNumbers.some(
+              (chalaanNumber) => chalaanNumber === value.trim()
+            )
+          )
+        ) {
           setErrors((prev) => ({
             ...prev,
-            chalaanNumber: `This chalaan number already exists at index ${
-              bills.findIndex((bill) => bill.chalaanNumber === value.trim()) + 1
+            chalaanNumbers: `This chalaan number already exists at index ${
+              bills.findIndex((bill) =>
+                bill.chalaanNumbers.some(
+                  (chalaanNumber) => chalaanNumber === value.trim()
+                )
+              ) + 1
             }.`,
           }));
-          // setSearchTerm(value.trim());
         }
       }
     } else {
@@ -113,10 +121,38 @@ export function EditBillForm({
       | number[]
       | string[]
       | undefined;
+      if (field === "chalaanNumbers") {
+        if (formData.chalaanNumbers.includes(currentInputs["chalaanNumbers"].trim())) {
+          setErrors((prev) => ({
+            ...prev,
+            chalaanNumbers: `This chalaan number "${currentInputs["chalaanNumbers"]}" already exists in current items.`,
+          }));
+          return
+        }
+        if (
+          bills.some((bill) =>
+            bill.chalaanNumbers.some(
+              (chalaanNumber) => {return chalaanNumber === currentInputs["chalaanNumbers"].trim()}
+            )
+          )
+        ) {
+          setErrors((prev) => ({
+            ...prev,
+            chalaanNumbers: `This chalaan number already exists at index ${
+              bills.findIndex((bill) =>
+                bill.chalaanNumbers.some(
+                  (chalaanNumber) => chalaanNumber === currentInputs["chalaanNumbers"].trim()
+                )
+              ) + 1
+            }.`,
+          }));
+          return
+        }
+      } 
     if (prevItems) {
       setFormData((prev) => ({
         ...prev,
-        [field]: [currentInputs[field]],
+        [field]: [...prevItems, currentInputs[field]],
       }));
     } else {
       setFormData((prev) => ({
@@ -146,16 +182,32 @@ export function EditBillForm({
         bill.billNumber === formData.billNumber &&
         bill.billNumber !== billToEdit.billNumber
     );
-    const chalaanNumberExists = bills.some(
-      (bill) =>
-        bill.chalaanNumber === formData.chalaanNumber &&
-        bill.chalaanNumber !== billToEdit.chalaanNumber
-    );
+    // const chalaanNumberExists = bills.some(
+    //   (bill) =>
+    //     bill.chalaanNumber === formData.chalaanNumber &&
+    //     bill.chalaanNumber !== billToEdit.chalaanNumber
+    // );
+
+    // Fucking monstrosity of a function
+    const chalaanNumberExists = bills
+      .flatMap((bill) => bill.chalaanNumbers)
+      .some(
+        (chalaanNumber) =>
+          formData.chalaanNumbers.some(
+            (formChalaanNumber) => chalaanNumber === formChalaanNumber
+          ) &&
+          !formData.chalaanNumbers.some((formChalaanNumber) =>
+            billToEdit.chalaanNumbers.some(
+              (currentBillChalaanNumber) =>
+                currentBillChalaanNumber == formChalaanNumber
+            )
+          )
+      );
 
     if (billNumberExists || chalaanNumberExists) {
       setErrors({
         billNumber: billNumberExists ? "This bill number already exists" : "",
-        chalaanNumber: chalaanNumberExists
+        chalaanNumbers: chalaanNumberExists
           ? "This chalaan number already exists"
           : "",
       });
@@ -163,7 +215,7 @@ export function EditBillForm({
     }
 
     onSubmit(formData);
-    setErrors({ billNumber: "", chalaanNumber: "" });
+    setErrors({ billNumber: "", chalaanNumbers: "" });
     setOpen(false);
   };
 
@@ -179,7 +231,7 @@ export function EditBillForm({
           <Pencil className="h-4 w-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6" >
+      <DialogContent className="sm:max-w-[800px] rounded-2xl border-[#E5E7EB] p-6">
         <DialogHeader>
           <div className="flex justify-between items-center">
             <DialogTitle className="text-2xl font-medium text-[#111827]">
@@ -266,29 +318,61 @@ export function EditBillForm({
 
             <div className="space-y-2">
               <Label
-                htmlFor="chalaanNumber"
+                htmlFor="chalaanNumbers"
                 className="text-[#374151] font-medium"
               >
-                Chalaan Number
+                Chalaan Number(s)
               </Label>
-              <Input
-                id="chalaanNumber"
-                name="chalaanNumber"
-                value={formData.chalaanNumber}
-                onChange={handleInputChange}
-                required
-                className={cn(
-                  "rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400",
-                  errors.chalaanNumber &&
-                    "border-red-500 focus:border-red-500 focus:ring-red-500"
-                )}
-              />
-              {errors.chalaanNumber && (
-                <p className="text-sm text-red-500 mt-1">
-                  {errors.chalaanNumber}
-                </p>
-              )}
+              <div className="flex gap-2">
+                <Input
+                  id={"chalaanNumbers"}
+                  name={"chalaanNumbers"}
+                  value={
+                    currentInputs[
+                      "chalaanNumbers" as keyof typeof currentInputs
+                    ]
+                  }
+                  onChange={handleInputChange}
+                  className="rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400"
+                />
+                <Button
+                  type="button"
+                  onClick={() =>
+                    handleAddItem(
+                      "chalaanNumbers" as keyof typeof currentInputs
+                    )
+                  }
+                  className="px-3 bg-slate-800"
+                >
+                  Add
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.chalaanNumbers?.map((item: string, index: number) => (
+                  <span
+                    key={index}
+                    className="bg-slate-100 text-slate-800 px-3 py-1 rounded-full flex items-center gap-2"
+                  >
+                    {item}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleRemoveItem("chalaanNumbers" as keyof Bill, index)
+                      }
+                      className="text-slate-500 hover:text-slate-700"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+              {errors.chalaanNumbers && (
+              <p className="text-sm text-red-500 mt-1">
+                {errors.chalaanNumbers}
+              </p>
+            )}
             </div>
+            
           </div>
 
           <div className="grid grid-cols-2 gap-4">

@@ -1,7 +1,7 @@
 interface Bill {
     customerName?: string
     billNumber: string
-    chalaanNumber: string
+    chalaanNumbers: string[]
     date?: Date
     labourerName: string[]
     materialType: string[]

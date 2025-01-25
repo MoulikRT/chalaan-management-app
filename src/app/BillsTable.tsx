@@ -26,7 +26,7 @@ const BillsTable = ({
   const filteredBills = bills.filter(
     (bill) =>
       bill.billNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bill.chalaanNumber.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      bill.chalaanNumbers?.some(chalaanNumber => chalaanNumber.toLowerCase().includes(searchTerm.toLowerCase())) || 
       bill.customerName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       bill.labourerName?.join().toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -48,7 +48,7 @@ const BillsTable = ({
               </TableHead>
               <TableHead className="text-[#4B5563] font-medium">Date</TableHead>
               <TableHead className="text-[#4B5563] font-medium">
-                Chalaan Number
+                Chalaan Number(s)
               </TableHead>
               <TableHead className="text-[#4B5563] font-medium">
                 Bill Number
@@ -88,7 +88,16 @@ const BillsTable = ({
                   {bill.date?.toLocaleDateString()}
                 </TableCell>
                 <TableCell className="text-[#374151]">
-                  {bill.chalaanNumber}
+                  <div className="space-y-1">
+                    {bill.chalaanNumbers?.map((name, idx) => (
+                      <span
+                        key={idx}
+                        className="block px-2 py-1 rounded-md bg-slate-50"
+                      >
+                        {name}
+                      </span>
+                    ))}
+                  </div>
                 </TableCell>
 
                 <TableCell className="text-[#374151]">
