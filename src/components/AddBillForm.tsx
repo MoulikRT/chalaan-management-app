@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import Bill from "@/types/bills.types";
+import parseDateString from "@/lib/date";
 
 export function AddBillForm({
   onSubmit,
@@ -36,6 +37,7 @@ export function AddBillForm({
     squareFoot: "",
     ratePerSqft: "",
     chalaanNumbers: "",
+    date: "",
   });
   const [formData, setFormData] = useState<Bill>({
     customerName: "",
@@ -52,25 +54,44 @@ export function AddBillForm({
   const [errors, setErrors] = useState({
     billNumber: "",
     chalaanNumbers: "",
+    date: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if (name === "billNumber" || name === "chalaanNumbers") {
+    if (name === "billNumber" || name === "chalaanNumbers" || name === "date") {
       setErrors((prev) => ({
         ...prev,
         [name]: "",
       }));
     }
 
-    if (["customerName", "billNumber", "total"].includes(name)) {
-      setFormData((prev) => ({
-        ...prev,
-        [name]: value.trim(),
-      }));
+    if (["customerName", "billNumber", "total", "date"].includes(name)) {
+      if (name === "date") {
+        setCurrentInputs((prev) => ({
+          ...prev,
+          date: value,
+        }));
 
-      // Validate as user types
+        const dateValue = parseDateString(value);
+        if (value && !isNaN(dateValue.getTime())) {
+          setFormData((prev) => ({
+            ...prev,
+            date: dateValue,
+          }));
+        } else {
+          setErrors((prev) => ({
+            ...prev,
+            date: "Please enter a valid date (e.g., 1/1/2025)",
+          }));
+        }
+      } else {
+        setFormData((prev) => ({
+          ...prev,
+          [name]: value.trim(),
+        }));
+      }
       if (name === "billNumber") {
         if (bills.some((bill) => bill.billNumber === value.trim())) {
           setErrors((prev) => ({
@@ -173,6 +194,7 @@ export function AddBillForm({
         chalaanNumbers: chalaanNumberExists
           ? "This chalaan number already exists"
           : "",
+        date: "",
       });
       return;
     }
@@ -189,7 +211,7 @@ export function AddBillForm({
       ratePerSqft: [],
       total: undefined,
     });
-    setErrors({ billNumber: "", chalaanNumbers: "" });
+    setErrors({ billNumber: "", chalaanNumbers: "", date: "" });
     setOpen(false);
   };
 
@@ -229,35 +251,53 @@ export function AddBillForm({
               <Label htmlFor="date" className="text-[#374151] font-medium">
                 Date
               </Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "w-full justify-start text-left font-normal rounded-lg border-[#E5E7EB]",
-                      !formData.date && "text-[#9CA3AF]"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {formData.date ? (
-                      format(formData.date, "PPP")
-                    ) : (
-                      <span>Pick a date</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0 rounded-xl">
-                  <Calendar
-                    mode="single"
-                    selected={formData.date}
-                    onSelect={(newDate) =>
-                      setFormData((prev) => ({ ...prev, date: newDate }))
-                    }
-                    initialFocus
-                    className="rounded-xl"
-                  />
-                </PopoverContent>
-              </Popover>
+              <div className="flex gap-2">
+                <Input
+                  id="date"
+                  name="date"
+                  type="text"
+                  placeholder="DD-MM-YYYY"
+                  value={currentInputs.date}
+                  onChange={handleInputChange}
+                  className={cn(
+                    "rounded-lg border-[#E5E7EB] focus:border-slate-400 focus:ring-slate-400",
+                    errors.date && "border-red-500 focus:border-red-500 focus:ring-red-500"
+                  )}
+                />
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={"outline"}
+                      className={cn(
+                        "px-3 bg-slate-800 text-white hover:bg-slate-700",
+                        !formData.date && "text-slate-200"
+                      )}
+                    >
+                      <CalendarIcon className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 rounded-xl">
+                    <Calendar
+                      mode="single"
+                      selected={formData.date}
+                      onSelect={(newDate) => {
+                        setFormData((prev) => ({ ...prev, date: newDate }));
+                        setCurrentInputs((prev) => ({ ...prev, date: format(newDate!, "dd-MM-yyyy") }))
+                        setErrors((prev) => ({
+                          ...prev,
+                          date: "",
+                        }));
+                        }
+                      }
+                      initialFocus
+                      className="rounded-xl"
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+              {errors.date && (
+                <p className="text-sm text-red-500 mt-1">{errors.date}</p>
+              )}
             </div>
 
             <div className="space-y-2">
